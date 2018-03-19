@@ -1,0 +1,25 @@
+Lecture 9: Nondeterminism
+
+Nondeterminism - a nonrealistic feature you can add to models of computation
+
+Pseudocode with Nondeterminism
+ - Add "goto-both", which is like a parallel fork
+
+Definition: Nondeterminism algo (overall) accepts iff at least 1 branch accepts and rejects if all branches reject
+
+Definition: Running time: max running time over all branches
+
+Definition: A Nondeterminism algo is a decider if all branches halt
+
+E.g. SAT (Formula SAT) solvable in polytime with a nondeterministic algo
+Call this algo "N"
+On output Phi with n variables, allocate x[1...n], i = 0
+"Top": i++; 
+ - if: i > n, then goto "Check"
+ - else: "goto-both": "Write 0", "Write 1"
+"Write 0": x[i] = 0, goto "Top"
+"Write 1": x[i] = 1, goto "Top"
+"Check": check if x satisfies Phi, if so, accept, else reject (this is totally deterministic)
+
+Observations:
+ - will spawn exactly 2^n branches

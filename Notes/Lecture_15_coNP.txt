@@ -1,0 +1,97 @@
+Lecture 15 coNP Notes
+
+We know NP are languages that we can efficiently verify if
+x in L
+
+coNP are the set of languages that we can efficiently verify 
+if x not in L
+
+UNSAT = not SAT = {<phi> : phi is not satisfiable}
+
+Definition: coNP = {L : not L in NP}
+Defintion: L in NP -> not L in coNP
+
+Note: coNP != not NP
+Pf: Empty language is in both
+
+Theorem: SAT in P <-> UNSAT in P
+Pf: We can just flip the output for either
+
+Fact: A <=_m^p B <-> (not A) <=_m^p (not B)
+
+Thrm: P is closed under complement (L in P <-> not L in P)
+Pf: We can just flip the output for either
+
+Corrollary: coNP is subset of EXP
+Pf: Let L in coNP 
+ -> (not L) in NP
+ -> (not L) in EXP
+ -> If we can decide (not L) in EXP, then we can just flip
+    to decide L in EXP
+ -> L in EXP
+
+Theorem: P is subset coNP
+Pf: L in P -> (not L) in P -> (not L) in NP -> L in NP
+
+Thrm: P = NP -> NP = coNP = P
+If P = NP, you can decide L in NP in polytime, so just do 
+opposite after.
+
+Cor: coNP != NP -> P != NP (Contrapositive of prev thrm)
+
+Thrm: NP = coNP <-> UNSAT in NP
+Pf: (->) easy bc UNSAT in coNP = NP
+    (<-) UNSAT in NP. WTS: coNP (subset of) NP
+         L in coNP -> (not L) in NP 
+      -> (not L) <=_m^P SAT  [Cook-Levin Theorem]
+      -> L <=_m^P UNSAT in NP. Therefore: L in NP!
+
+Def: L is coNP-complete if L in coNP and 
+
+Why is UNSAT in NP?
+ - UNSAT in coNP and coNP = NP (we assumed this)
+TODO HERE
+
+Languages in NP and coNP (NP intersect coNP)
+Perfect Matching in NP intersect coNP
+ - PM also in P
+Linear Programming in NP intersect coNP
+PRIMES in NP intersect coNP
+Proved by Pratt in 1975: PRIMES in P
+ - PRIMES also in P
+
+Theorem: FACTOR in (NP intersect coNP)
+ - FACTOR = {<X,AB> : X has a prime factor between A and B}
+ - This is like an artifical version of FACTORING
+ - you can sort of do a binary search to get all
+   the factors using FACTOR.
+ - FACTOR is in NP because:
+   - certificate is the prime factor
+ - FACTOR in in coNP because:
+   - certificate x has no prime factor in [A,B]
+
+Practice Problems:
+ - Write the definition of coNP
+ - is coNP == not NP? Prove it.
+ - Why is P closed under complement?
+   i.e. L in P -> (not L) in P?
+ - Give a reason why the following are in 
+   NP intersect coNP:
+   1.
+
+Quiz Questions
+1. Every problem in P is known to be in NP (intersect) coNP
+   -> True
+2. Let FALSIFIABLE to be the language {<phi> : there is a 
+   truth assignment that makes phi false}
+   Is this in coNP, NP, P? 
+   -> This is definitely in NP
+3. If TAUT in P, then 3COL is also in P. T/F?
+   - TAUT = {<phi> : every truth assignment makes phi true}
+   - not TAUT = {<phi> : there exists truth assign. s.t. phi 
+                         is false}
+   - not TAUT in NP -> TAUT in coNP
+   - phi in not TAUT <-> not phi in SAT
+   - not TAUT and SAT are kind of the same difficulty
+   - TAUT in P -> (not TAUT) in P -> SAT in P -> 3-COL in P
+   -> True

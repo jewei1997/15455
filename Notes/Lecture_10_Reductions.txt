@@ -1,0 +1,95 @@
+Lecture 10: Reductions
+
+Theorem: If SAT (Formula) in P, then 4COL in P.
+
+Idea: Given M_SAT in polytime, we build algo M_4COL solving 4COL in polytime, using M_SAT as a subroutine.
+ - "4COL <=^P SAT" (4COL reduces, in polytime, to SAT)
+ - Use SAT as helper function for 4COL
+
+Given a graph: G = (V,E), |V| = n
+ - We want to encode G is 4 colorable by "Phi_G is satisfiable"
+ - Introduce 2n variables called x1, x1', x2, x2', ... 
+ - idea: 2 bits (xi, xi') encode vertex in color
+
+xi | xi' | color
+-----------------
+ F |  F  | R
+ F |  R  | B
+ T |  F  | Y
+ T |  T  | W
+
+ - For each edge (i,j) in E, "encode" constraint of diff. colors
+ - "(xi, xi') != (xj, xj') -> lnot (xi <-> xj land xj <-> xj')
+ - remember p <-> q = (p -> q) land (q -> p)
+ - remember p -> q = lnot p lor q
+ - create Phi_G = land_{(i,j) in E} phi_ij
+ - algo R : <G> -> <Phi_G>
+ - |<Phi_G>| = O(m log n) <= poly(|<G>|)
+ - algo R is polytime
+
+
+Claim 1: <G> in 4COL <-> <Phi_G> in SAT
+ - (->) G 4-colorable -> exists valid 4 coloring for G -> x built from c in the way implied indeed satisfies Phi_G
+ - (<-) just how the way Phi_G is set up visibly implies that the vertices must have diff. colors
+
+Consequence: M_SAT(<Phi_G>) gives correct answer for <G> in 4COL
+ - Therefore: SAT in P -> 4COL in P
+
+Remember: Use M_SAT only once at the end and we just went with its answer
+
+Definition: Let A, B be lanuages. "A has a polytime mapping reduction to B" written "A <=_m^P" if there exists polytime algo R: {0,1}^* -> {0,1}^* s.t. for all x x in A <-> R(x) in B
+e.g. 4COL <=_m^P SAT
+
+Theorem: If A <=_m^P B (polytime mapping reduction), B in P -> A in P
+
+Proof: Given polytime M_B for B, reduction R, M_B(R(x)) decides (x in A)? in poly(|x|) time.
+ - This is using the fact that a poly of a poly is still a poly
+
+Theorem: 3COL <=_m^P 4COL
+Proof: 
+ - Goal design an algo R(<G>) = <H>
+ - Want G is 3COL <-> H is 4COL
+ - Simply add 1 more vertex and connect it to every vertex in G
+ - Check:
+   - R is polytime? CHECK
+
+Theorem: <=_m^P is transitive. If A <=_m^P B (say algo R1), B <=_m^P C (say algo R2)-> A <=_m^P C (we want algo R)
+Proof: R(x) = R2(R1(x))
+Therefore: 3COL <=_m^P SAT
+ - because we showed 3COL <=_m^P 4COL and 4COL <=_m^P SAT 
+
+We could allow M_A to make many calls to M_B in solving A.
+e.g. 4CHROMA be {<G> : G "chromatic number is 4"} (G is 4COL but not 3COL) (the least number of colors to color a graph)
+
+Claim: 4CHROMA <=_T^P SAT (Turing Reduction)
+Proof: Given <G>:
+ - Use "SAT oracle", on R_{4COL->SAT}(<G>)
+   - if reject -> reject // G is not 4COL
+ - Use "SAT oracle" on R_{3COL->SAT}(<G>)}
+   - if rejects -> accept // G is not 3COL
+   - else -> reject // G is also 3COL
+
+Theorem 1: A <=_T^P B, B in P -> A in P
+Theorem 2: A <=_m^P B, B in NP -> A in NP
+Rem: Seemingly false: A <=_T^P B, B in NP -> A in NP
+
+Proof of Theorem 2: Assume there exists polytime (determinsitic) R s.t. x in A <-> R(x) in B
+ - Assume there exists non-deterministic polytime N_B deciding B
+ - Want a polytime non-deterministic algo N_A deciding A
+ - N_A(x): Do R(x) producing some x'
+   - Do N_B(x')
+ - N_A decides A?
+   - x in A <->_(R) x' in B <-> N_B(x') accepts <-> N_A(x) accepts
+
+SAT <=_m^P CIRCUIT-SAT
+Proof: Trivial because CIRCUIT-SAT is a special case of SAT
+
+CIRCUIT-SAT <=_m^P SAT (interesting!)
+Proof:
+ - We have a circuit c with n inputs, we want to transform this into CIRCUIT-SAT problem
+ - exists x s.t. C(x) = true <-> exists w s.t. Phi_C(x) = true
+ - Idea: introduce a variable w_i for each wire in C
+ - w_1, w_2, ..., w_n stands for input wires
+ - w_out stands for the output wire
+ - 
+THESE NOTES ARE UNFINISHED

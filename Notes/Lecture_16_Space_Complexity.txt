@@ -1,0 +1,190 @@
+Lecture 15: Space Complexity
+
+Definition: Space Complexity of a decider TM is a function S : N -> N.
+S(n) = max inputs x s.t. |x| = n over the set 
+       { # distinct tape cells accessed by M(x) (on work tape(s))}
+
+Space complexity - TMs with a special read-only input tape
+Picture:
+
+M   input tape: _ _ _ _ _ _ _ _ _ _   <- this is an empty tape lol
+    work tape:  _ _ _ _ _ _ _ _ _ _
+    work tape:  _ _ _ _ _ _ _ _ _ _ (can have multiple work tapes)
+    * as long as you use a constant number of tapes, it is fine *
+    
+You cannot write to the input tape, but you can write to the working tape.
+You are only charged for space usage on work tape.
+
+Reminder: if you want to: multitape TM -----> single tape TM
+                              time T   ----->  time O(T^2)
+                             Space S   -----> Space O(S)
+                     bc you can cram it all into 1 tape with some constants
+
+Definition: SPACE(f(n)) = { languages A : there exists a TM deciding A
+                                          with space complexity O(f(n)) }
+
+We generally only consider space at least log(n) bc we would at least 
+like to know, what is the length of the input?
+
+Fact: Using O(log(n)) space, a TM on input x can compute (write it down
+in base 2 on its work tape), n = |x|.
+
+Def: L = SPACE(log(n)) <- all the probs you can solve with O(log(n)) space
+
+e.g. A = { 0^m 1^m : m in N}
+ - if 0, increment counter, if 1, decrement counter
+ - Make sure you hit 0 at the end
+
+Proposition: PALINDROMES in L
+On input x...
+ - determine n = |x| // O(logn) space, compute n on work tape #1
+ - for i = 1...n:    // we can store i on work tape #2, O(logn) space
+      reject if x[i] != x[n+1-i] // compute n + 1 - i on tape #3
+ - accept
+
+* we can use multiple work tapes 
+ - i is stored on tape #2
+ - compute n + 1 - i on tape #3
+   - copy n from tape #1 - tape #3 // O(logn) space
+   - increment
+   - copy "i" from tape #2 -> tape #4
+   - repeatedly decr on tape 4 & on tape 3 till tape 4 hits 0
+ - x[i] ? copy i onto tape 5 and repeatedly decrement it and move input 
+          head to the right.
+ * we can reuse tapes on different iterations *
+ * do not spawn new tapes every iteration *
+
+"L in pseudocode"
+ - can assume that "n" is known
+ - "variables": "i", "j", ints ranging in 0...n...poly(n) 
+    - there are all storable in O(logn) space
+ - L is approx constant (O(1)) # of variables
+ - no array/mem allocation
+ - read-only input lookups is OK
+ - basic arithmetic operations variables are OK
+
+What if:
+ - a, b are "vars"
+ - 0 <= a, b <= n
+ - 0 <= C <= n^2
+ - we normally do the "normal" algo for multiplication (what you always
+   do with pencil and paper) it would take O(log^2 n) space. BAD :(
+ - instead, we can do:
+   - C = 0
+   - for i = 1...b:
+     - C += a
+ - which is logn.
+
+ST-PATH = {<G, s, t> (directed graph) : there exists s --> t in G}
+ - is this problem in L?
+ - normal way to do this is BFS
+   - this takes omega(n), just for each vertex to say whether you've seen
+     it or not.
+ - for DFS:
+   - same thing
+ - Savitch's Theorem (1970): ST-PATH in SPACE(log^2 n)
+ - Reingold (2004): Undirected version is in L
+
+CIRCUIT-EVAL : { <C,x> : C(x) = 1 } <-- this is in P
+ - doable in linear space
+ - believed not in sublinear space
+ - the only way you can do it is naive way
+
+3SAT
+ - O(n) space, just use most naive algo
+ - Give phi: for x in {0,1}^n, check if phi(x) = 1 (reuse the space)
+
+Definition: PSPACE = union_{k in N} {SPACE(n^k)}
+CIRCUIT-EVAL, 3SAT, PATH in PSPACE
+L subset of PSPACE
+Since 3SAT in PSPACE, it follows that all of NP is in PSPACE
+
+Fact: TIME(f(n)) is subset of SPACE(f(n))
+Why?
+ - if something runs in f(n) time, it only has time to reach f(n) tape cells
+e.g. P is subset of PSPACE
+
+Theorem: For f(n) >= log(n), SPACE(f(n)) subset of TIME(2^{O(f(n))})
+e.g. L subset of P. PSPACE is subset of EXP
+
+Proof: Say M decides A in O(f(n)) space
+Assume WLOG M has 1 work tape, 1 read-only input tape
+For such a TM M, define a configuration of M on input x as:
+ - usual configuration of work tape contents
+   + state + work tape head position
+ - suppose we were at the following state:
+
+M     i n p u t x
+          ^        <- Suppose these are where heads of TM are pointing
+              v    <-
+      w o r k t a p e
+
+ - w o r k q2 t a p e ; 3
+ - the 3 is for the input tape head position (pointing at 3rd char, p)
+   - note: should probably write in binary
+
+key point 1:
+ - M is a decider -> never loops, never repeats a config (otherwise would
+   be infinite)
+ - therefore: running time <= # of distinct configs
+
+key point 2:
+ - # config <= |gamma|^{f(n)}  // const, all possible work tape contents
+             * |Q|             // const, num of states for TM to be in
+             * f(n)            // work head tape pos
+             * n               // pos of work tape head
+            <= 2^{f(n)}
+             = 2^{O(f(n))}
+             = TIME(2^O(n))
+             = E
+
+      ------------------------------------
+      |                              EXP  | 
+      |                                   |
+      |     -----------------------       |
+      |     |             PSPACE  |       |
+      |     |                     |       |
+      |     |  ---------------    |       |
+      |     |  |         NP  |    |       |
+      |     |  |  ---------- |    |       |
+      |     |  |  |      P | |    |       |
+      |     |  |  |------------   |       |
+      |     |  |  | -----  | ||coNP       |
+      |     |  |  | | L |  | ||   |       |
+      |     |  |  | |___|  | ||   |       |
+      |     |  |  |        | ||   |       |
+      |     |  |  |------------   |       |
+      |     |  |  |        | |    |       |
+      |     |  |  |________| |    |       |
+      |     |  |_____________|    |       |
+      |     |                     |       |
+      |     ----------------------        |
+      -------------------------------------
+
+We know by time hierarchy theorem that P != EXP
+But others may be equal
+We want to try to find some problems that really capture the essence of 
+a complexity class
+ - We believe 3SAT is in NP but not in P
+ - We believe TAUT is in coNP but not in P
+ - PALINDROMES is in L (log space)
+ - We believe CIRCUIT-EVAL is in P, but not in L
+ - We also want to find a problem in PSPACE but not in others
+
+L subset P subset PSPACE subset EXP
+ - we know P and EXP are not equal by time hierarchy theorem
+ - we know P != PSPACE or PSPACE != EXP (we know that or of the two is true
+   but we don't know which is true, in fact, we think neither is true)
+ - same situation: P != PSPACE or P != L (we believe both are true, but
+   unproven)
+ - theres a SPACE hierarchy theorem (SHT) that will show that L and PSPACE
+   are different.
+
+SPACE Hierachy Theorem (SHT)
+ - Let f(n) be a space constructible function (f(n) >= log(n), compute in 
+   O(f(n)) space)
+ - Then there exists language A in SPACE(f(n)) that's not in SPACE(g(n))
+   for any g(n) = o(f(n))
+ - e.g. f(n) = log^2(n) g(n) = log(n)
+   -> there exists A in TIME(log^2)\L  *not sure if he meant SPACE here
+                also in PSPACE
